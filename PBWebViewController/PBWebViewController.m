@@ -7,6 +7,7 @@
 //
 
 #import "PBWebViewController.h"
+#import "OWActivityViewController.h"
 
 @interface PBWebViewController () <UIPopoverControllerDelegate>
 
@@ -68,6 +69,9 @@
     [super viewWillDisappear:animated];
     [self.webView stopLoading];
     self.webView.delegate = nil;
+    self.navigationController.toolbarHidden = YES;
+    self.editing = NO;
+
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
 
@@ -165,34 +169,45 @@
 
 - (void)action:(id)sender
 {
-    if (self.activitiyPopoverController.popoverVisible) {
-        [self.activitiyPopoverController dismissPopoverAnimated:YES];
-        return;
+    if (!self.URL) {
+        return ;
     }
     
-    NSArray *activityItems;
-    if (self.activityItems) {
-        activityItems = [self.activityItems arrayByAddingObject:self.URL];
-    } else {
-        activityItems = @[self.URL];
+    OWSafariActivity *safariActivity = [[OWSafariActivity alloc] init];
+    OWCopyActivity *copyActivity = [[OWCopyActivity alloc] init];
+    
+    
+    NSMutableArray *activities = [[NSMutableArray alloc] init];
+
+    if ([MFMailComposeViewController canSendMail]) {
+        OWMailActivity *mailActivity = [[OWMailActivity alloc] init];
+        [activities addObject:mailActivity];
+    }
+
+    if ([MFMessageComposeViewController canSendText]) {
+        OWMessageActivity *messageActivity = [[OWMessageActivity alloc] init];
+        [activities addObject:messageActivity];
     }
     
-    UIActivityViewController *vc = [[UIActivityViewController alloc] initWithActivityItems:activityItems
-                                                                     applicationActivities:self.applicationActivities];
-    if (self.excludedActivityTypes) {
-        vc.excludedActivityTypes = self.excludedActivityTypes;
+    if( NSClassFromString (@"UIActivityViewController") ) {
+        OWFacebookActivity *facebookActivity = [[OWFacebookActivity alloc] init];
+        OWSinaWeiboActivity *sinaWeiboActivity = [[OWSinaWeiboActivity alloc] init];
+        [activities addObjectsFromArray:@[
+         facebookActivity, sinaWeiboActivity
+         ]];
     }
     
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        [self presentViewController:vc animated:YES completion:NULL];
-    } else {
-        if (!self.activitiyPopoverController) {
-            self.activitiyPopoverController = [[UIPopoverController alloc] initWithContentViewController:vc];
-        }
-        self.activitiyPopoverController.delegate = self;
-        [self.activitiyPopoverController presentPopoverFromBarButtonItem:[self.toolbarItems lastObject]
-                                                permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-    }
+    [activities addObjectsFromArray:@[safariActivity, copyActivity]];
+    
+    // Create OWActivityViewController controller and assign data source
+    //
+    OWActivityViewController *activityViewController = [[OWActivityViewController alloc] initWithViewController:self activities:activities];
+    activityViewController.userInfo = @{
+                                        @"text": self.title != nil ? self.title : self.URL.absoluteString,
+                                        @"url": self.URL
+                                        };
+    
+    [activityViewController presentFromRootViewController];
 }
 
 #pragma mark - Web view delegate
