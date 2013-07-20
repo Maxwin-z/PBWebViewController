@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SMViewController.h"
 
-@interface PBWebViewController : UIViewController <UIWebViewDelegate>
+@interface PBWebViewController : SMViewController <UIWebViewDelegate>
 
 @property (strong, nonatomic) NSURL *URL;
 
