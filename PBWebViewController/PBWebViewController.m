@@ -30,7 +30,7 @@
     [self.webView loadRequest:request];
     
     if (self.navigationController.toolbarHidden) {
-        [self.navigationController setToolbarHidden:NO animated:YES];
+        [self.navigationController setToolbarHidden:NO animated:NO];
     }
 }
 
