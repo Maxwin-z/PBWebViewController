@@ -46,6 +46,10 @@
 {
     self.webView = [[UIWebView alloc] init];
     self.webView.scalesPageToFit = YES;
+    UIScrollView *scrollView = self.webView.scrollView;
+    UIEdgeInsets insets = scrollView.contentInset;
+    insets.top = SM_TOP_INSET;
+    scrollView.contentInset = scrollView.scrollIndicatorInsets = insets;
     self.view = self.webView;
 }
 
