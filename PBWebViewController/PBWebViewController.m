@@ -211,7 +211,13 @@
                                         @"url": self.URL
                                         };
     
-    [activityViewController presentFromRootViewController];
+    if ([SMUtils isPad]) {
+        self.activitiyPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityViewController];
+        activityViewController.presentingPopoverController = self.activitiyPopoverController;
+        [self.activitiyPopoverController presentPopoverFromRect:CGRectMake(self.view.frame.size.width - 10, self.view.frame.size.height, 1, 1) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
+    } else {
+        [activityViewController presentFromRootViewController];
+    }
 }
 
 #pragma mark - Web view delegate
