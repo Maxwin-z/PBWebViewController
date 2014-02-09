@@ -106,8 +106,27 @@
 
 - (UIImage *)rightTriangleImage
 {
-    UIImage *image = [self leftTriangleImage];
-    return [UIImage imageWithCGImage:image.CGImage scale:image.scale orientation:UIImageOrientationDown];
+    static UIImage *image;
+    
+    static dispatch_once_t predicate;
+    dispatch_once(&predicate, ^{
+        CGSize size = CGSizeMake(14.0f, 16.0f);
+        UIGraphicsBeginImageContextWithOptions(size, NO, 0.0f);
+        
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        [path moveToPoint:CGPointMake(0.0f, 0.0f)];
+        [path addLineToPoint:CGPointMake(14.0f, 8.0f)];
+        [path addLineToPoint:CGPointMake(0.0f, 16.0f)];
+        [path closePath];
+        [path fill];
+        
+        image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+    });
+    
+    return image;
+//    UIImage *image = [self leftTriangleImage];
+//    return [UIImage imageWithCGImage:image.CGImage scale:image.scale orientation:UIImageOrientationUpMirrored];
 }
 
 - (void)setupToolBarItems
