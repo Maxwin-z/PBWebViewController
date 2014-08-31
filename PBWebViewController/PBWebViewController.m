@@ -49,6 +49,7 @@
     UIScrollView *scrollView = self.webView.scrollView;
     UIEdgeInsets insets = scrollView.contentInset;
     insets.top = SM_TOP_INSET;
+    insets.bottom = 44; // bottom toolbar
     scrollView.contentInset = scrollView.scrollIndicatorInsets = insets;
     self.view = self.webView;
 }
